@@ -7,6 +7,9 @@
     <string name="sev_mod">Moderate</string>
     <string name="sev_maj">Major</string>
     <string name="submit_desc">Submits the report</string>
+    <string name="to_report">Report</string>
+    <string name="back">Back</string>
+    <string name="my_reports">My Reports</string>
 
     <string-array name="report_types">
         <item>Heavy traffic</item>
