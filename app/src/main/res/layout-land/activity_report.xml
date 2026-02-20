@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".TrafficReport">
+
+    <TextView
+        android:id="@+id/app_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/app_name"
+        android:textSize="30sp"
+        android:layout_marginTop="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <EditText
+        android:id="@+id/rep_title"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="70dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="@dimen/comp_margin"
+        android:importantForAutofill="no"
+        android:hint="@string/report_title"
+        android:inputType="text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/rep_type"/>
+
+
+    <Spinner
+        android:id="@+id/rep_type"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:spinnerMode="dropdown"
+        android:layout_margin="@dimen/comp_margin"
+        android:entries="@array/report_types"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/rep_title" />
+
+    <EditText
+        android:id="@+id/rep_desc"
+        android:layout_width="0dp"
+        android:layout_height="100dp"
+        android:importantForAutofill="no"
+        android:hint="@string/report_desc"
+        android:layout_margin="@dimen/comp_margin"
+        android:inputType="text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/rep_type"/>
+
+    <Button
+        android:id="@+id/sev_min"
+        android:layout_width="110dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/comp_margin"
+        android:text="@string/sev_min"
+        android:backgroundTint="@color/green"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/sev_mod"
+        app:layout_constraintTop_toBottomOf="@id/rep_desc"/>
+
+    <Button
+        android:id="@+id/sev_mod"
+        android:layout_width="110dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/comp_margin"
+        android:text="@string/sev_mod"
+        android:backgroundTint="@color/yellow"
+        app:layout_constraintEnd_toStartOf="@id/sev_maj"
+        app:layout_constraintStart_toEndOf="@id/sev_min"
+        app:layout_constraintTop_toBottomOf="@id/rep_desc"/>
+
+    <Button
+        android:id="@+id/sev_maj"
+        android:layout_width="110dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/comp_margin"
+        android:text="@string/sev_maj"
+        android:backgroundTint="@color/red"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/sev_mod"
+        app:layout_constraintTop_toBottomOf="@id/rep_desc"/>
+
+    <ImageButton
+        android:id="@+id/backBtn"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        app:srcCompat="@drawable/outline_arrow_back_24"
+        android:contentDescription="@string/back"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/submit_rep"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:srcCompat="@drawable/baseline_add_24"
+        android:layout_margin="@dimen/comp_margin"
+        android:contentDescription="@string/submit_desc"/>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

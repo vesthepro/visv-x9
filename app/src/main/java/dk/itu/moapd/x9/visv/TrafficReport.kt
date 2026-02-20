@@ -1,7 +1,7 @@
 package dk.itu.moapd.x9.visv
 
+import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -13,7 +13,9 @@ class TrafficReport : AppCompatActivity() {
 
     private lateinit var binding: ActivityReportBinding
     private var selectedSeverity: String? = null
-    private val TAG = "TrafficReport"
+
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,10 +58,19 @@ class TrafficReport : AppCompatActivity() {
 
         val severity = selectedSeverity ?: "None"
 
-        Log.d(TAG, "Button pressed:  $severity")
+        val resultIntent = Intent().apply {
+            putExtra("title", title)
+            putExtra("type", type)
+            putExtra("desc", desc)
+            putExtra("severity", severity)
+        }
+        setResult(RESULT_OK, resultIntent)
+        finish()
+
+        /*Log.d(TAG, "Button pressed:  $severity")
         Log.d(TAG, "Report title:  $title")
         Log.d(TAG, "Report type:  $type")
-        Log.d(TAG, "Report description:  $desc")
+        Log.d(TAG, "Report description:  $desc")*/
 
     }
     private fun validateInputs(): Boolean {
