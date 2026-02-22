@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.X9">
         <activity
-            android:name=".TrafficReport"
+            android:name=".ReportActivity"
             android:exported="false"/>
 
 

@@ -54,7 +54,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.toReport.setOnClickListener {
-            val intent = Intent(this, TrafficReport::class.java)
+            val intent = Intent(this, ReportActivity::class.java)
             reportLauncher.launch(intent)
         }
     }

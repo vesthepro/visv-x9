@@ -9,7 +9,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import dk.itu.moapd.x9.visv.databinding.ActivityReportBinding
 
-class TrafficReport : AppCompatActivity() {
+class ReportActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityReportBinding
     private var selectedSeverity: String? = null
