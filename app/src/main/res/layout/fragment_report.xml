@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ReportActivity">
+    tools:context=".fragments.ui.report.ReportFragment">
 
     <TextView
         android:id="@+id/app_title"
@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:text="@string/app_name"
         android:textSize="30sp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="30dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
@@ -22,7 +22,7 @@
         android:id="@+id/rep_title"
         android:layout_width="0dp"
         android:layout_height="50dp"
-        android:layout_marginTop="70dp"
+        android:layout_marginTop="150dp"
         android:layout_marginStart="10dp"
         android:layout_marginEnd="@dimen/comp_margin"
         android:importantForAutofill="no"
@@ -97,6 +97,7 @@
         android:background="?attr/selectableItemBackgroundBorderless"
         app:srcCompat="@drawable/outline_arrow_back_24"
         android:contentDescription="@string/back"
+        android:layout_marginTop="30dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         />
@@ -110,6 +111,5 @@
         app:srcCompat="@drawable/baseline_add_24"
         android:layout_margin="@dimen/comp_margin"
         android:contentDescription="@string/submit_desc"/>
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>
