@@ -5,27 +5,28 @@ import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.View
 import android.widget.Toast
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import dk.itu.moapd.x9.visv.R
 import dk.itu.moapd.x9.visv.databinding.FragmentReportBinding
+import dk.itu.moapd.x9.visv.fragments.ui.model.ReportModel
+import dk.itu.moapd.x9.visv.fragments.ui.model.ReportViewModel
 import dk.itu.moapd.x9.visv.fragments.ui.utils.viewBinding
 
 
 class ReportFragment : Fragment(R.layout.fragment_report) {
 
     private val binding by viewBinding(FragmentReportBinding::bind)
-
     private var selectedSeverity: String? = null
-
     private val TAG = "ReportFragment"
+    private val viewModel: ReportViewModel by activityViewModels()
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         binding.backBtn.setOnClickListener {
-            findNavController().navigate(
-                R.id.action_report_to_dashboard) //pobackstack :)
+            findNavController().popBackStack() //pobackstack :)
         }
 
         binding.sevMin.setOnClickListener { setSeverity("Minor") }
@@ -51,8 +52,16 @@ class ReportFragment : Fragment(R.layout.fragment_report) {
         val title = binding.repTitle.text.toString()
         val type = binding.repType.selectedItem?.toString() ?: "None"
         val desc = binding.repDesc.text.toString()
-
         val severity = selectedSeverity ?: "None"
+
+        val report = ReportModel(
+            reportTitle = title,
+            reportType = type,
+            reportSeverity = severity,
+            reportDescription = desc
+        )
+
+        viewModel.reports.add(report)
 
         Log.d(TAG, "Received report:")
         Log.d(TAG, "Title:  $title")
@@ -61,8 +70,7 @@ class ReportFragment : Fragment(R.layout.fragment_report) {
         Log.d(TAG, "severity: $severity")
 
         Toast.makeText(requireContext(), "Report received: $title", Toast.LENGTH_LONG).show()
-        findNavController().navigate(
-            R.id.action_report_to_dashboard) //pobackstack :)
+        findNavController().popBackStack() //pobackstack :)
     }
     private fun validateInputs(): Boolean {
         val title = binding.repTitle.text.toString().trim()
