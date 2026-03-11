@@ -2,6 +2,7 @@ package dk.itu.moapd.x9.visv.fragments.ui.main
 
 import android.os.Bundle
 import android.util.Log
+import androidx.activity.ComponentActivity
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.NavHostFragment
@@ -9,7 +10,6 @@ import dk.itu.moapd.x9.visv.R
 import dk.itu.moapd.x9.visv.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
-
 
     private val TAG = "MainActivity"
     private lateinit var binding: ActivityMainBinding

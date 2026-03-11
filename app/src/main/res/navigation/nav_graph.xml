@@ -12,6 +12,9 @@
         <action
             android:id="@+id/action_dashboard_to_report"
             app:destination="@id/fragment_report" />
+        <action
+            android:id="@+id/action_dashboard_to_compose_dashboard"
+            app:destination="@id/fragment_compose_dashboard" />
     </fragment>
 
     <fragment
@@ -21,6 +24,14 @@
         <action
             android:id="@+id/action_report_to_dashboard"
             app:destination="@id/fragment_dashboard"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/fragment_compose_dashboard"
+        android:name="dk.itu.moapd.x9.visv.fragments.ui.reportItem.ComposeDashboardFragment">
+        <action
+            android:id="@+id/action_compose_dashboard_to_report"
+            app:destination="@id/fragment_report"/>
     </fragment>
 
 

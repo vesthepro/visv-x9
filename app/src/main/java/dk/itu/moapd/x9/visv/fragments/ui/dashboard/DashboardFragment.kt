@@ -35,6 +35,10 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
             findNavController().navigate(
                 R.id.action_dashboard_to_report)
         }
+        binding.toComposeDashboard.setOnClickListener {
+            findNavController().navigate(
+                R.id.action_dashboard_to_compose_dashboard)
+        }
     }
 
     private fun setupRecyclerView() = with(binding.recyclerView) {
