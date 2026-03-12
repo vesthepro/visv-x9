@@ -1,6 +1,5 @@
 package dk.itu.moapd.x9.visv.fragments.ui.dashboard
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
@@ -22,7 +21,6 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
     private val binding by viewBinding(FragmentDashboardBinding::bind)
 
     private val viewModel: ReportViewModel by activityViewModels()
-    private lateinit var adapter: CustomAdapter
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

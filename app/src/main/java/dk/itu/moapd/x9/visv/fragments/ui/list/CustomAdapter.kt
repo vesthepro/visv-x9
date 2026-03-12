@@ -4,7 +4,6 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import dk.itu.moapd.x9.visv.databinding.RowItemBinding
-import dk.itu.moapd.x9.visv.fragments.ui.list.CustomAdapter.ViewHolder
 import dk.itu.moapd.x9.visv.fragments.ui.model.ReportModel
 
 class CustomAdapter(private val data: List<ReportModel>) :
