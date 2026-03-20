@@ -1,10 +1,12 @@
-package dk.itu.moapd.x9.visv.dashboard
+package dk.itu.moapd.x9.visv.view
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
@@ -13,8 +15,11 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import dk.itu.moapd.x9.visv.viewmodels.ReportViewModel
 
+
 @Composable
 fun DashboardScreen(viewModel: ReportViewModel, navController: NavController) {
+    val reports by viewModel.reports.observeAsState(emptyList())
+
     Column(modifier = Modifier
         .fillMaxSize()
         .padding(WindowInsets.safeDrawing.asPaddingValues())) {
@@ -33,7 +38,7 @@ fun DashboardScreen(viewModel: ReportViewModel, navController: NavController) {
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            items(viewModel.reports) { report ->
+            items(reports) { report ->
                 ReportItemCard(
                     title = report.reportTitle,
                     type = report.reportType,

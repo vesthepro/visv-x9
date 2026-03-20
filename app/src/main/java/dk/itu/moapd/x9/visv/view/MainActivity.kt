@@ -1,4 +1,4 @@
-package dk.itu.moapd.x9.visv
+package dk.itu.moapd.x9.visv.view
 
 import android.os.Bundle
 import android.util.Log
@@ -6,15 +6,11 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.compose.material3.MaterialTheme
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import dk.itu.moapd.x9.visv.viewmodels.ReportViewModel
-import dk.itu.moapd.x9.visv.dashboard.DashboardScreen
-import dk.itu.moapd.x9.visv.report.ReportScreen
 import dk.itu.moapd.x9.visv.ui.theme.X9Theme
-
+import dk.itu.moapd.x9.visv.viewmodels.ReportViewModel
 
 class MainActivity : ComponentActivity() {
 

@@ -1,4 +1,4 @@
-package dk.itu.moapd.x9.visv.report
+package dk.itu.moapd.x9.visv.view
 
 import android.util.Log
 import android.widget.Toast
@@ -50,7 +50,7 @@ fun ReportScreen(viewModel: ReportViewModel, navController: NavController) {
                 reportSeverity = selectedSeverity ?: "None",
                 reportDescription = description
             )
-            viewModel.reports.add(report)
+            viewModel.addReport(report)
 
             Log.d(TAG, "Received report:")
             Log.d(TAG, "Title: $title")
