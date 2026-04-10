@@ -1,5 +1,6 @@
 package dk.itu.moapd.x9.visv.view
 
+import android.content.Intent
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -9,57 +10,81 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.google.firebase.auth.FirebaseAuth
 import dk.itu.moapd.x9.visv.viewmodels.ReportViewModel
 
 
 @Composable
-fun DashboardScreen(viewModel: ReportViewModel, navController: NavController) {
+fun DashboardScreen(viewModel: ReportViewModel, navController: NavController, auth: FirebaseAuth) {
     val reports by viewModel.reports.observeAsState(emptyList())
+    val context = LocalContext.current
 
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .padding(WindowInsets.safeDrawing.asPaddingValues())) {
-        Text(
-            text = "X9",
-            style = MaterialTheme.typography.headlineLarge,
-            color = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.fillMaxWidth(),
-            textAlign = TextAlign.Center
-        )
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(WindowInsets.safeDrawing.asPaddingValues())
+    ) {
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Column(modifier = Modifier.fillMaxSize()) {
 
-        LazyColumn(
-            modifier = Modifier.weight(1f),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            items(reports) { report ->
-                ReportItemCard(
-                    title = report.reportTitle,
-                    type = report.reportType,
-                    severity = report.reportSeverity,
-                    description = report.reportDescription
-                )
+            Text(
+                text = "X9",
+                style = MaterialTheme.typography.headlineLarge,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            LazyColumn(
+                modifier = Modifier.weight(1f),
+                contentPadding = PaddingValues(16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(reports) { report ->
+                    ReportItemCard(
+                        title = report.reportTitle,
+                        type = report.reportType,
+                        severity = report.reportSeverity,
+                        description = report.reportDescription
+                    )
+                }
+            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Button(
+                    onClick = { navController.navigate("report") },
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text("To Report")
+                }
             }
         }
+        Button(
+            onClick = {
+                auth.signOut()
 
-        Row(
+                val intent = Intent(context, LoginActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or
+                        Intent.FLAG_ACTIVITY_CLEAR_TASK
+
+                context.startActivity(intent)
+            },
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                .align(Alignment.TopStart)
+                .padding(16.dp)
         ) {
-            Button(
-                onClick = { navController.navigate("report") },
-                modifier = Modifier.weight(1f)
-            ) {
-                Text("To Report")
-            }
+            Text("Logout")
         }
     }
 }

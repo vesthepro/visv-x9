@@ -33,7 +33,7 @@ class MainActivity : ComponentActivity() {
 
                 NavHost(navController = navController, startDestination = "dashboard") {
                     composable("dashboard") {
-                        DashboardScreen(viewModel = viewModel, navController = navController)
+                        DashboardScreen(viewModel = viewModel, navController = navController, auth = auth)
                     }
                     composable("report") {
                         ReportScreen(viewModel = viewModel, navController = navController)
