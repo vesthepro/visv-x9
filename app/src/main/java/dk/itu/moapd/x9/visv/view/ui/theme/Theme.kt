@@ -1,6 +1,5 @@
-package dk.itu.moapd.x9.visv.ui.theme
+package dk.itu.moapd.x9.visv.view.ui.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme

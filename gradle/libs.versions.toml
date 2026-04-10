@@ -10,6 +10,8 @@ kotlin = "2.3.10"
 google-services = "4.4.4"
 firebaseBom = "34.11.0"
 composeBom = "2026.03.00"
+firebaseAuthKtx = "23.2.1"
+firebaseUiAuth = "9.1.1"
 navigationCompose = "2.9.7"
 
 [libraries]
@@ -30,6 +32,8 @@ androidx-compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-
 androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-compose-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata" }
+firebase-ui-auth = { module = "com.firebaseui:firebase-ui-auth", version.ref = "firebaseUiAuth" }
+firebase-auth-ktx = { group = "com.google.firebase", name = "firebase-auth-ktx", version.ref = "firebaseAuthKtx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

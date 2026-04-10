@@ -1,5 +1,6 @@
 package dk.itu.moapd.x9.visv.view
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -9,20 +10,25 @@ import androidx.activity.viewModels
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import dk.itu.moapd.x9.visv.ui.theme.X9Theme
+import com.google.firebase.auth.FirebaseAuth
+import dk.itu.moapd.x9.visv.view.ui.theme.X9Theme
 import dk.itu.moapd.x9.visv.viewmodels.ReportViewModel
 
 class MainActivity : ComponentActivity() {
 
     private val TAG = "MainActivity"
+    private lateinit var auth: FirebaseAuth
     private val viewModel: ReportViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
+        auth = FirebaseAuth.getInstance()
+
         setContent {
             X9Theme {
+
                 val navController = rememberNavController()
 
                 NavHost(navController = navController, startDestination = "dashboard") {
@@ -40,6 +46,8 @@ class MainActivity : ComponentActivity() {
     override fun onStart() {
         super.onStart()
         Log.d(TAG, "onStart() method called.")
+
+        auth.currentUser ?: startLoginActivity()
     }
     override fun onResume() {
         super.onResume()
@@ -52,5 +60,11 @@ class MainActivity : ComponentActivity() {
     override fun onStop() {
         super.onStop()
         Log.d(TAG, "onStop() method called.")
+    }
+    private fun startLoginActivity() {
+        Intent(this, LoginActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or
+                    Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }.let(::startActivity)
     }
 }
