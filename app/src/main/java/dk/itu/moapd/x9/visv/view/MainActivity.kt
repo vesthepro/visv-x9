@@ -7,6 +7,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.runtime.LaunchedEffect
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -17,23 +18,23 @@ import dk.itu.moapd.x9.visv.viewmodels.ReportViewModel
 class MainActivity : ComponentActivity() {
 
     private val TAG = "MainActivity"
-    private lateinit var auth: FirebaseAuth
+    private val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
     private val viewModel: ReportViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        auth = FirebaseAuth.getInstance()
-
         setContent {
             X9Theme {
-
                 val navController = rememberNavController()
-
                 NavHost(navController = navController, startDestination = "dashboard") {
                     composable("dashboard") {
-                        DashboardScreen(viewModel = viewModel, navController = navController, auth = auth)
+                        DashboardScreen(
+                            viewModel = viewModel,
+                            navController = navController,
+                            auth = auth
+                        )
                     }
                     composable("report") {
                         ReportScreen(viewModel = viewModel, navController = navController)
@@ -45,26 +46,27 @@ class MainActivity : ComponentActivity() {
 
     override fun onStart() {
         super.onStart()
-        Log.d(TAG, "onStart() method called.")
+        Log.d(TAG, "onStart() called")
 
-        auth.currentUser ?: startLoginActivity()
+        if (auth.currentUser == null) {
+            startActivity(Intent(this, LoginActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            })
+        }
     }
-    override fun onResume() {
-        super.onResume()
-        Log.d(TAG, "onResume() method called.")
-    }
-    override fun onPause() {
-        super.onPause()
-        Log.d(TAG, "onPause() method called.")
-    }
+
     override fun onStop() {
         super.onStop()
-        Log.d(TAG, "onStop() method called.")
+        Log.d(TAG, "onStop() called")
     }
-    private fun startLoginActivity() {
-        Intent(this, LoginActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or
-                    Intent.FLAG_ACTIVITY_CLEAR_TASK
-        }.let(::startActivity)
+
+    override fun onResume() {
+        super.onResume()
+        Log.d(TAG, "onResume() called")
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Log.d(TAG, "onPause() called")
     }
 }
