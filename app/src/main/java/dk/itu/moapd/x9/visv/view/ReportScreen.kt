@@ -45,10 +45,10 @@ fun ReportScreen(viewModel: ReportViewModel, navController: NavController) {
 
         if (titleError == null && descError == null && !severityError) {
             val report = ReportModel(
-                reportTitle = title,
+                reportTitle = title.trim(),
                 reportType = selectedType,
                 reportSeverity = selectedSeverity ?: "None",
-                reportDescription = description
+                reportDescription = description.trim()
             )
             viewModel.addReport(report)
 
