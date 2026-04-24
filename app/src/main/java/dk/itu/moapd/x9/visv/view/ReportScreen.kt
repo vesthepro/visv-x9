@@ -9,8 +9,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import dk.itu.moapd.x9.visv.R
 import dk.itu.moapd.x9.visv.viewmodels.ReportViewModel
 import dk.itu.moapd.x9.visv.model.ReportModel
 
@@ -167,7 +169,7 @@ fun ReportScreen(viewModel: ReportViewModel, navController: NavController) {
                 onClick = { navController.popBackStack() },
                 modifier = Modifier.weight(1f)
             ) {
-                Text("Back")
+                Text(stringResource(R.string.back))
             }
             Button(
                 onClick = { validateAndSubmit() },

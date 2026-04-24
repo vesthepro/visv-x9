@@ -14,7 +14,7 @@ class LoginActivity : ComponentActivity() {
     private val signInLauncher =
         registerForActivityResult(FirebaseAuthUIActivityResultContract()) { result ->
             if (result.resultCode == RESULT_OK) {
-                // Login success → go to MainActivity
+                // Login success -> go to MainActivity
                 startActivity(Intent(this, MainActivity::class.java))
                 finish()
             }

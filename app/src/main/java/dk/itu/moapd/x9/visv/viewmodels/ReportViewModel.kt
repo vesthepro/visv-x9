@@ -32,7 +32,7 @@ class ReportViewModel : ViewModel() {
                 Log.d("DB", "RAW VALUE = ${snapshot.value}")
 
                 val list = snapshot.children.mapNotNull {
-                    it.getValue(ReportModel::class.java)
+                    it.getValue(ReportModel::class.java)?.copy(key = it.key ?: "")
                 }
                 Log.d("DB", "PARSED SIZE = ${list.size}")
 
@@ -55,5 +55,10 @@ class ReportViewModel : ViewModel() {
         )
 
         reportsRef.child(reportId).setValue(reportToSave)
+    }
+
+    fun deleteReport(report: ReportModel) {
+        if (report.key.isBlank()) return
+        reportsRef.child(report.key).removeValue()
     }
 }

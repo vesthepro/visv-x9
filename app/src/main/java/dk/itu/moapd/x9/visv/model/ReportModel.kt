@@ -1,6 +1,7 @@
 package dk.itu.moapd.x9.visv.model
 
 data class ReportModel(
+    val key: String = "",
     val reportTitle: String = "",
     val reportType: String = "",
     val reportSeverity: String = "",

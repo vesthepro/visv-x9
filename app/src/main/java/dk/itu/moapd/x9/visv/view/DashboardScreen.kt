@@ -1,6 +1,7 @@
 package dk.itu.moapd.x9.visv.view
 
 import android.content.Intent
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -11,15 +12,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
+import dk.itu.moapd.x9.visv.R
 import dk.itu.moapd.x9.visv.viewmodels.ReportViewModel
 
 
 @Composable
+@OptIn(ExperimentalMaterial3Api::class)
 fun DashboardScreen(viewModel: ReportViewModel, navController: NavController, auth: FirebaseAuth) {
     val reports by viewModel.reports.collectAsState()
     val context = LocalContext.current
@@ -47,13 +51,45 @@ fun DashboardScreen(viewModel: ReportViewModel, navController: NavController, au
                 contentPadding = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(reports) { report ->
-                    ReportItemCard(
-                        title = report.reportTitle,
-                        type = report.reportType,
-                        severity = report.reportSeverity,
-                        description = report.reportDescription
+                items(reports, key = { it.key }) { report ->
+                    val dismissState = rememberSwipeToDismissBoxState(
+                        confirmValueChange = { value ->
+                            if (value == SwipeToDismissBoxValue.EndToStart) {
+                                viewModel.deleteReport(report)
+                                true
+                            } else false
+                        }
                     )
+
+                    SwipeToDismissBox(
+                        state = dismissState,
+                        enableDismissFromStartToEnd = false,
+                        backgroundContent = {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(vertical = 8.dp)
+                                    .background(
+                                        color = MaterialTheme.colorScheme.errorContainer,
+                                        shape = CardDefaults.elevatedShape
+                                    ),
+                                contentAlignment = Alignment.CenterEnd
+                            ) {
+                                Text(
+                                    text = "Delete",
+                                    color = MaterialTheme.colorScheme.onErrorContainer,
+                                    modifier = Modifier.padding(end = 16.dp)
+                                )
+                            }
+                        }
+                    ) {
+                        ReportItemCard(
+                            title = report.reportTitle,
+                            type = report.reportType,
+                            severity = report.reportSeverity,
+                            description = report.reportDescription
+                        )
+                    }
                 }
             }
 
@@ -84,7 +120,7 @@ fun DashboardScreen(viewModel: ReportViewModel, navController: NavController, au
                 .align(Alignment.TopStart)
                 .padding(16.dp)
         ) {
-            Text("Logout")
+            Text(stringResource(R.string.logout))
         }
     }
 }
