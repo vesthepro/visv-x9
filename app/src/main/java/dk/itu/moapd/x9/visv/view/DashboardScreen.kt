@@ -27,6 +27,7 @@ import dk.itu.moapd.x9.visv.viewmodels.ReportViewModel
 fun DashboardScreen(viewModel: ReportViewModel, navController: NavController, auth: FirebaseAuth) {
     val reports by viewModel.reports.collectAsState()
     val context = LocalContext.current
+    val currentUid = auth.currentUser?.uid ?: ""
 
 
     Box(
@@ -52,34 +53,35 @@ fun DashboardScreen(viewModel: ReportViewModel, navController: NavController, au
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(reports, key = { it.key }) { report ->
-                    val dismissState = rememberSwipeToDismissBoxState(
-                        confirmValueChange = { value ->
-                            if (value == SwipeToDismissBoxValue.EndToStart) {
-                                viewModel.deleteReport(report)
-                                true
-                            } else false
-                        }
-                    )
+                    val isOwner = report.uid == currentUid
+                    val dismissState = rememberSwipeToDismissBoxState()
+
+                    if (dismissState.currentValue == SwipeToDismissBoxValue.EndToStart && isOwner) {
+                        viewModel.deleteReport(report)
+                    }
 
                     SwipeToDismissBox(
                         state = dismissState,
                         enableDismissFromStartToEnd = false,
+                        enableDismissFromEndToStart = isOwner,
                         backgroundContent = {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .padding(vertical = 8.dp)
-                                    .background(
-                                        color = MaterialTheme.colorScheme.errorContainer,
-                                        shape = CardDefaults.elevatedShape
-                                    ),
-                                contentAlignment = Alignment.CenterEnd
-                            ) {
-                                Text(
-                                    text = "Delete",
-                                    color = MaterialTheme.colorScheme.onErrorContainer,
-                                    modifier = Modifier.padding(end = 16.dp)
-                                )
+                            if (isOwner) {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(vertical = 8.dp)
+                                        .background(
+                                            color = MaterialTheme.colorScheme.errorContainer,
+                                            shape = CardDefaults.elevatedShape
+                                        ),
+                                    contentAlignment = Alignment.CenterEnd
+                                ) {
+                                    Text(
+                                        text = "Delete",
+                                        color = MaterialTheme.colorScheme.onErrorContainer,
+                                        modifier = Modifier.padding(end = 16.dp)
+                                    )
+                                }
                             }
                         }
                     ) {
