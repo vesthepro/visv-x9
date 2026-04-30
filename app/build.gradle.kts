@@ -67,5 +67,5 @@ dependencies {
     implementation(libs.firebase.database.ktx)
     implementation(libs.firebase.ui.auth)
     implementation(libs.firebase.ui.database)
-
+    implementation(libs.google.play.services.location)
 }

@@ -1,10 +1,14 @@
 package dk.itu.moapd.x9.visv.view
 
 import android.content.Intent
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import android.Manifest
+import android.content.pm.PackageManager
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -16,6 +20,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
 import dk.itu.moapd.x9.visv.R
@@ -28,6 +33,14 @@ fun DashboardScreen(viewModel: ReportViewModel, navController: NavController, au
     val reports by viewModel.reports.collectAsState()
     val context = LocalContext.current
     val currentUid = auth.currentUser?.uid ?: ""
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+    ) { granted ->
+        if (granted) {
+            // TODO: call your GPS/tracking function here
+        }
+    }
 
 
     Box(
@@ -107,6 +120,23 @@ fun DashboardScreen(viewModel: ReportViewModel, navController: NavController, au
                 ) {
                     Text("To Report")
                 }
+                // GPS button
+                Button(
+                    onClick = {
+                        requestOrStartTracking(
+                            context = context,
+                            onHasPermission = {
+                                // TODO: call your GPS/tracking function here
+                            },
+                            onRequestPermission = {
+                                permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                            }
+                        )
+                    },
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text("Start Tracking")
+                }
             }
         }
         Button(
@@ -172,4 +202,16 @@ fun ReportItemCard(
             )
         }
     }
+}
+fun requestOrStartTracking(
+    context: android.content.Context,
+    onHasPermission: () -> Unit,
+    onRequestPermission: () -> Unit,
+) {
+    val hasPermission = ContextCompat.checkSelfPermission(
+        context,
+        Manifest.permission.ACCESS_FINE_LOCATION,
+    ) == PackageManager.PERMISSION_GRANTED
+
+    if (hasPermission) onHasPermission() else onRequestPermission()
 }
