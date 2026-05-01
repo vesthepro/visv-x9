@@ -92,6 +92,9 @@ class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceCh
                     composable("report") {
                         ReportScreen(viewModel = viewModel, navController = navController)
                     }
+                    composable("map") {
+                        MapScreen(viewModel = viewModel)
+                    }
                 }
             }
         }

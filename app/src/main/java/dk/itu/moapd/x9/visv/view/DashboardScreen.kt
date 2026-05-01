@@ -165,6 +165,12 @@ fun DashboardScreen(
                 ) {
                     Text("Stop")
                 }
+                Button(
+                    onClick = { navController.navigate("map") },
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text("Map")
+                }
             }
         }
         Button(

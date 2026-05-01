@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.google.services)
     alias(libs.plugins.devtools.ksp)
+    alias(libs.plugins.secrets.gradle)
 }
 
 android {
@@ -68,4 +69,5 @@ dependencies {
     implementation(libs.firebase.ui.auth)
     implementation(libs.firebase.ui.database)
     implementation(libs.google.play.services.location)
+    implementation(libs.maps.compose)
 }

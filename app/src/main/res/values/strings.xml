@@ -10,5 +10,6 @@
     <string name="notification_text">Tap to return to the app</string>
     <string name="text_not_available">not available</string>
     <string name="text_speed_km">%d KM</string>
+    <string name="itu_title">IT University of Copenhagen\n</string>
 
 </resources>

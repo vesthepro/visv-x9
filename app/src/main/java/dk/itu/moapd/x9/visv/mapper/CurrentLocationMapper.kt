@@ -17,9 +17,9 @@ import java.util.Locale
  */
 fun fieldsFromLocation(context: Context, location: Location): CurrentLocation {
     return CurrentLocation(
-        latitude = String.format(Locale.getDefault(), "%.6f", location.latitude),
-        longitude = String.format(Locale.getDefault(), "%.6f", location.longitude),
-        altitude = String.format(Locale.getDefault(), "%.6f", location.altitude),
+        latitude = String.format(Locale.US, "%.6f", location.latitude),
+        longitude = String.format(Locale.US, "%.6f", location.longitude),
+        altitude = String.format(Locale.US, "%.6f", location.altitude),
         speed = context.getString(R.string.text_speed_km, (location.speed * 3.6f).toInt()),
         time = location.time.toSimpleDateTimeString(),
     )

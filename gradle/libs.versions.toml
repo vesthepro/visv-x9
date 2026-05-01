@@ -19,6 +19,8 @@ firebaseAuthKtx = "23.2.1"
 firebaseUi = "9.1.1"
 firebaseDatabaseKtx = "21.0.0"
 navigationCompose = "2.9.7"
+mapsCompose = "8.0.1"
+secretsGradle = "2.0.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -46,11 +48,14 @@ androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref =
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomKtx" }
 androidx-lifecycle-livedata-ktx = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "lifecycleLivedataKtx" }
 google-play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "servicesLocation" }
+maps-compose = { group = "com.google.maps.android", name="maps-compose", version.ref = "mapsCompose" }
+
 
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+secrets-gradle = { id = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin", version.ref = "secretsGradle"}
 devtools-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 google-services = { id = "com.google.gms.google-services", version.ref = "google-services"}
 
