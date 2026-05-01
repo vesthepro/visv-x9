@@ -3,4 +3,12 @@
     <string name="title_activity_login">LoginActivity</string>
     <string name="back">Back</string>
     <string name="logout">Logout</string>
+    <string name="preference_file_key">dk.itu.moapd.x9.visv.PREFERENCE_FILE_KEY</string>
+    <string name="notification_channel_name">Location Tracking</string>
+    <string name="notification_channel_description">Used to track your location in the background</string>
+    <string name="notification_title">X9 is tracking your location</string>
+    <string name="notification_text">Tap to return to the app</string>
+    <string name="text_not_available">not available</string>
+    <string name="text_speed_km">%d KM</string>
+
 </resources>

@@ -9,8 +9,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import android.Manifest
 import android.content.pm.PackageManager
+import android.location.Location
+import android.util.Log
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -29,16 +32,30 @@ import dk.itu.moapd.x9.visv.viewmodels.ReportViewModel
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-fun DashboardScreen(viewModel: ReportViewModel, navController: NavController, auth: FirebaseAuth) {
+fun DashboardScreen(
+    viewModel: ReportViewModel,
+    navController: NavController,
+    auth: FirebaseAuth,
+    onStartTracking: () -> Unit,
+    onStopTracking: () -> Unit,
+    onLocationReady: ((Location) -> Unit) -> Unit,
+) {
     val reports by viewModel.reports.collectAsState()
     val context = LocalContext.current
     val currentUid = auth.currentUser?.uid ?: ""
+
 
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
     ) { granted ->
         if (granted) {
-            // TODO: call your GPS/tracking function here
+           onStartTracking()
+        }
+    }
+    LaunchedEffect(Unit) {
+        onLocationReady { location ->
+            Log.d("Location", "Lat: ${location.latitude}, Lng: ${location.longitude}")
+            // you can pass this to the viewModel if needed
         }
     }
 
@@ -126,8 +143,9 @@ fun DashboardScreen(viewModel: ReportViewModel, navController: NavController, au
                         requestOrStartTracking(
                             context = context,
                             onHasPermission = {
-                                // TODO: call your GPS/tracking function here
-                            },
+                                onStartTracking()
+                                Log.d("Location", "Started tracking")
+                                              },
                             onRequestPermission = {
                                 permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
                             }
@@ -136,6 +154,15 @@ fun DashboardScreen(viewModel: ReportViewModel, navController: NavController, au
                     modifier = Modifier.weight(1f)
                 ) {
                     Text("Start Tracking")
+                }
+                Button(
+                    onClick = {
+                        onStopTracking()
+                        Log.d("Location", "Stopped tracking")
+                              },
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text("Stop")
                 }
             }
         }
