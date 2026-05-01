@@ -7,5 +7,10 @@ data class ReportModel(
     val reportSeverity: String = "",
     val reportDescription: String = "",
     val createdAt: Long = 0L,
-    val uid: String = ""
+    val uid: String = "",
+    val latitude: String = "",
+    val longitude: String = "",
+    val altitude: String = "",
+    val speed: String = "",
+    val locationTime: String = "",
 )

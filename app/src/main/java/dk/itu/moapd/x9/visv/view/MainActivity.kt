@@ -108,8 +108,8 @@ class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceCh
             })
             return
         }
-        // Start and bind service
-        startLocationService()
+        // bind service
+
         Intent(this, LocationService::class.java).also { intent ->
             bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
         }

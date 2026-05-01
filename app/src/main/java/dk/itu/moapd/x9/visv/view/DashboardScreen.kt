@@ -55,6 +55,7 @@ fun DashboardScreen(
     LaunchedEffect(Unit) {
         onLocationReady { location ->
             Log.d("Location", "Lat: ${location.latitude}, Lng: ${location.longitude}")
+            viewModel.updateLocation(context, location)
             // you can pass this to the viewModel if needed
         }
     }

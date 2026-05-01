@@ -1,5 +1,7 @@
 package dk.itu.moapd.x9.visv.viewmodels
 
+import android.content.Context
+import android.location.Location
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -12,6 +14,9 @@ import com.google.firebase.database.ValueEventListener
 import dk.itu.moapd.x9.visv.model.ReportModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import dk.itu.moapd.x9.visv.mapper.fieldsFromLocation
+import dk.itu.moapd.x9.visv.model.CurrentLocation
 
 class ReportViewModel : ViewModel() {
 
@@ -20,6 +25,8 @@ class ReportViewModel : ViewModel() {
 
     private val _reports = MutableStateFlow<List<ReportModel>>(emptyList())
     val reports: StateFlow<List<ReportModel>> = _reports
+    private val _currentLocation = MutableStateFlow<CurrentLocation?>(null)
+    val currentLocation = _currentLocation.asStateFlow()
 
     init {
         listenToReports()
@@ -60,5 +67,8 @@ class ReportViewModel : ViewModel() {
     fun deleteReport(report: ReportModel) {
         if (report.key.isBlank()) return
         reportsRef.child(report.key).removeValue()
+    }
+    fun updateLocation(context: Context, location: Location) {
+        _currentLocation.value = fieldsFromLocation(context, location)
     }
 }

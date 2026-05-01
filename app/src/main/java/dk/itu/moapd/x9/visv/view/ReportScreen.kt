@@ -16,12 +16,14 @@ import dk.itu.moapd.x9.visv.R
 import dk.itu.moapd.x9.visv.viewmodels.ReportViewModel
 import dk.itu.moapd.x9.visv.model.ReportModel
 
+
 private const val TAG = "ReportScreen"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReportScreen(viewModel: ReportViewModel, navController: NavController) {
     val context = LocalContext.current
+    val currentLocation by viewModel.currentLocation.collectAsState()
 
     var title by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
@@ -50,7 +52,12 @@ fun ReportScreen(viewModel: ReportViewModel, navController: NavController) {
                 reportTitle = title.trim(),
                 reportType = selectedType,
                 reportSeverity = selectedSeverity ?: "None",
-                reportDescription = description.trim()
+                reportDescription = description.trim(),
+                latitude = currentLocation?.latitude ?: "",
+                longitude = currentLocation?.longitude ?: "",
+                altitude = currentLocation?.altitude ?: "",
+                speed = currentLocation?.speed ?: "",
+                locationTime = currentLocation?.time ?: "",
             )
             viewModel.addReport(report)
 
