@@ -67,6 +67,7 @@ dependencies {
     ksp(libs.androidx.room.compiler)
     implementation(libs.firebase.auth.ktx)
     implementation(libs.firebase.database.ktx)
+    implementation(libs.firebase.storage.ktx)
     implementation(libs.firebase.ui.auth)
     implementation(libs.firebase.ui.database)
     implementation(libs.google.play.services.location)
@@ -75,4 +76,5 @@ dependencies {
     implementation(libs.androidx.camera.lifecycle)
     implementation(libs.androidx.camera.view)
     implementation(libs.coil.compose)
+
 }

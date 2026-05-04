@@ -36,18 +36,11 @@ import androidx.compose.material.icons.filled.Photo
 import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.SwitchCamera
 
-/**
- * The main screen component.
- *
- * @param viewModel A view model sensitive to changes in the `MainActivity` UI components.
- * @param onOpenViewer Callback to open the image viewer.
- */
 @Composable
 fun CameraScreen(
     viewModel: CameraViewModel,
     onPhotoTaken: (Uri) -> Unit,
     onClose: () -> Unit,
-    onOpenViewer: () -> Unit,
     ) {
     val context = LocalContext.current
     val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
@@ -74,6 +67,14 @@ fun CameraScreen(
             hasPermission = granted
         },
     )
+    val galleryLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri ->
+        uri?.let {
+            onPhotoTaken(it)
+            onClose()
+        }
+    }
 
     // Launch permission prompt once.
     LaunchedEffect(Unit) {
@@ -185,12 +186,14 @@ fun CameraScreen(
             Spacer(modifier = Modifier.width(16.dp))
 
             OutlinedIconCircleButton(
-                enabled = hasPermission && imageUri != null,
+                enabled = hasPermission,
                 imageVector = Icons.Filled.Photo,
                 contentDescription = "Gallery",
                 iconSize = 24.dp,
                 strokeWidth = 2.dp,
-                onClick = onOpenViewer,
+                onClick = {
+                    galleryLauncher.launch("image/*")
+                },
             )
         }
 

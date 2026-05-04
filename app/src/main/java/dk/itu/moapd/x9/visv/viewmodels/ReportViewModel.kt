@@ -19,6 +19,20 @@ import dk.itu.moapd.x9.visv.mapper.fieldsFromLocation
 import dk.itu.moapd.x9.visv.model.CurrentLocation
 
 class ReportViewModel : ViewModel() {
+    private val _title = MutableStateFlow("")
+    val title = _title.asStateFlow()
+
+    private val _description = MutableStateFlow("")
+    val description = _description.asStateFlow()
+
+    private val _selectedSeverity = MutableStateFlow<String?>(null)
+    val selectedSeverity = _selectedSeverity.asStateFlow()
+
+    private val _selectedType = MutableStateFlow("None")
+    val selectedType = _selectedType.asStateFlow()
+
+    private val _photoUri = MutableStateFlow<String?>(null)
+    val photoUri = _photoUri.asStateFlow()
 
     private val database = FirebaseDatabase.getInstance()
     private val reportsRef = database.getReference("reports")
@@ -70,5 +84,24 @@ class ReportViewModel : ViewModel() {
     }
     fun updateLocation(context: Context, location: Location) {
         _currentLocation.value = fieldsFromLocation(context, location)
+    }
+    fun updateTitle(value: String) {
+        _title.value = value
+    }
+
+    fun updateDescription(value: String) {
+        _description.value = value
+    }
+
+    fun updateSeverity(value: String?) {
+        _selectedSeverity.value = value
+    }
+
+    fun updateType(value: String) {
+        _selectedType.value = value
+    }
+
+    fun updatePhoto(uri: String?) {
+        _photoUri.value = uri
     }
 }

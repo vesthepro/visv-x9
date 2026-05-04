@@ -1,5 +1,6 @@
 package dk.itu.moapd.x9.visv.view
 
+import android.net.Uri
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
@@ -13,15 +14,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import dk.itu.moapd.x9.visv.R
+import com.google.firebase.auth.FirebaseAuth
 import dk.itu.moapd.x9.visv.viewmodels.ReportViewModel
 import dk.itu.moapd.x9.visv.model.ReportModel
-import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
 import coil.compose.AsyncImage
+import dk.itu.moapd.x9.visv.data.FirebaseStorageRepository
 import dk.itu.moapd.x9.visv.permissions.CameraPermissionHelper
 
 
@@ -33,32 +34,39 @@ fun ReportScreen(viewModel: ReportViewModel, navController: NavController) {
     val context = LocalContext.current
     val currentLocation by viewModel.currentLocation.collectAsState()
 
-    var title by remember { mutableStateOf("") }
-    var description by remember { mutableStateOf("") }
-    var selectedSeverity by remember { mutableStateOf<String?>(null) }
-    var selectedType by remember { mutableStateOf("None") }
-    var dropdownExpanded by remember { mutableStateOf(false) }
-    var capturedImageUri by remember { mutableStateOf<Uri?>(null) }
+    val title by viewModel.title.collectAsState()
+    val description by viewModel.description.collectAsState()
+    val selectedSeverity by viewModel.selectedSeverity.collectAsState()
+    val selectedType by viewModel.selectedType.collectAsState()
+    val capturedImageUri by viewModel.photoUri.collectAsState()
 
     var titleError by remember { mutableStateOf<String?>(null) }
     var descError by remember { mutableStateOf<String?>(null) }
     var severityError by remember { mutableStateOf(false) }
 
+    var dropdownExpanded by remember { mutableStateOf(false) }
+
     val reportTypes = listOf("None", "Heavy traffic", "Crash", "Speed camera", "Road incident", "Other")
     val severities = listOf("Minor", "Moderate", "Major")
 
-    // Permission launcher — requests camera permission, then navigates if granted
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { granted ->
         if (granted) navController.navigate("camera")
         else Toast.makeText(context, "Camera permission is required to attach a photo", Toast.LENGTH_SHORT).show()
     }
-    // Observe the URI returned by CameraScreen via savedStateHandle
-    val navBackStack = navController.currentBackStackEntry
-    val savedUriString = navBackStack?.savedStateHandle?.get<String>("photo_uri")
+
+    // Receive photo from CameraScreen
+    val navBackStackEntry = navController.currentBackStackEntry
+    val savedUriString = navBackStackEntry
+        ?.savedStateHandle
+        ?.get<String>("photo_uri")
+
     LaunchedEffect(savedUriString) {
-        savedUriString?.let { capturedImageUri = Uri.parse(it) }
+        savedUriString?.let {
+            viewModel.updatePhoto(it)   // IMPORTANT: update ViewModel, NOT local state
+            navBackStackEntry.savedStateHandle.remove<String>("photo_uri")
+        }
     }
 
     fun validateAndSubmit() {
@@ -66,11 +74,43 @@ fun ReportScreen(viewModel: ReportViewModel, navController: NavController) {
         descError = if (description.trim().isEmpty()) "Description cannot be empty" else null
         severityError = selectedSeverity == null
 
-        if (severityError) {
-            Toast.makeText(context, "Please select a severity", Toast.LENGTH_SHORT).show()
-        }
+        if (titleError != null || descError != null || severityError) return
 
-        if (titleError == null && descError == null && !severityError) {
+        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: "anonymous"
+        val imageUri = capturedImageUri?.let { Uri.parse(it) }
+
+        if (imageUri != null) {
+
+            FirebaseStorageRepository.uploadImage(
+                context = context,
+                uri = imageUri,
+                onSuccess = { downloadUrl ->
+
+                    val report = ReportModel(
+                        reportTitle = title.trim(),
+                        reportType = selectedType,
+                        reportSeverity = selectedSeverity ?: "None",
+                        reportDescription = description.trim(),
+                        latitude = currentLocation?.latitude ?: "",
+                        longitude = currentLocation?.longitude ?: "",
+                        altitude = currentLocation?.altitude ?: "",
+                        speed = currentLocation?.speed ?: "",
+                        locationTime = currentLocation?.time ?: "",
+                        photoUri = downloadUrl
+                    )
+
+                    viewModel.addReport(report)
+
+                    Toast.makeText(context, "Report received: $title", Toast.LENGTH_LONG).show()
+                    navController.popBackStack()
+                },
+                onFailure = {
+                    Toast.makeText(context, "Image upload failed", Toast.LENGTH_SHORT).show()
+                }
+            )
+
+        } else {
+
             val report = ReportModel(
                 reportTitle = title.trim(),
                 reportType = selectedType,
@@ -81,16 +121,10 @@ fun ReportScreen(viewModel: ReportViewModel, navController: NavController) {
                 altitude = currentLocation?.altitude ?: "",
                 speed = currentLocation?.speed ?: "",
                 locationTime = currentLocation?.time ?: "",
-                photoUri = capturedImageUri?.toString() ?: "",
+                photoUri = ""
             )
-            viewModel.addReport(report)
 
-            Log.d(TAG, "Received report:")
-            Log.d(TAG, "Title: $title")
-            Log.d(TAG, "Type: $selectedType")
-            Log.d(TAG, "Description: $description")
-            Log.d(TAG, "Severity: $selectedSeverity")
-            Log.d(TAG, "Photo URI: $capturedImageUri")
+            viewModel.addReport(report)
 
             Toast.makeText(context, "Report received: $title", Toast.LENGTH_LONG).show()
             navController.popBackStack()
@@ -105,19 +139,23 @@ fun ReportScreen(viewModel: ReportViewModel, navController: NavController) {
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
+
         Text(
             text = "New Report",
             style = MaterialTheme.typography.headlineLarge,
-            color = MaterialTheme.colorScheme.onSurface
+            color = MaterialTheme.colorScheme.onBackground
         )
 
-        // Title field
+        // Title
         OutlinedTextField(
             value = title,
-            onValueChange = { title = it; titleError = null },
+            onValueChange = {
+                viewModel.updateTitle(it)
+                titleError = null
+            },
             label = { Text("Title") },
             isError = titleError != null,
-            supportingText = { if (titleError != null) Text(titleError!!) },
+            supportingText = { titleError?.let { Text(it) } },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
         )
@@ -132,11 +170,14 @@ fun ReportScreen(viewModel: ReportViewModel, navController: NavController) {
                 onValueChange = {},
                 readOnly = true,
                 label = { Text("Type") },
-                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = dropdownExpanded) },
+                trailingIcon = {
+                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = dropdownExpanded)
+                },
                 modifier = Modifier
                     .menuAnchor()
                     .fillMaxWidth()
             )
+
             ExposedDropdownMenu(
                 expanded = dropdownExpanded,
                 onDismissRequest = { dropdownExpanded = false }
@@ -144,31 +185,37 @@ fun ReportScreen(viewModel: ReportViewModel, navController: NavController) {
                 reportTypes.forEach { type ->
                     DropdownMenuItem(
                         text = { Text(type) },
-                        onClick = { selectedType = type; dropdownExpanded = false }
+                        onClick = {
+                            viewModel.updateType(type)
+                            dropdownExpanded = false
+                        }
                     )
                 }
             }
         }
 
-        // Severity selector
+        // Severity
         Column {
             Text(
                 text = "Severity",
-                style = MaterialTheme.typography.labelLarge,
-                color = if (severityError) MaterialTheme.colorScheme.error
+                color = if (severityError)
+                    MaterialTheme.colorScheme.error
                 else MaterialTheme.colorScheme.onSurface
             )
-            Spacer(modifier = Modifier.height(8.dp))
+
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 severities.forEach { severity ->
                     val isSelected = selectedSeverity == severity
+
                     Button(
-                        onClick = { selectedSeverity = severity; severityError = false },
+                        onClick = {
+                            viewModel.updateSeverity(severity)
+                            severityError = false
+                        },
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = if (isSelected) MaterialTheme.colorScheme.primary
-                            else MaterialTheme.colorScheme.surfaceVariant,
-                            contentColor = if (isSelected) MaterialTheme.colorScheme.onPrimary
-                            else MaterialTheme.colorScheme.onSurfaceVariant
+                            containerColor =
+                                if (isSelected) MaterialTheme.colorScheme.primary
+                                else MaterialTheme.colorScheme.surfaceVariant
                         )
                     ) {
                         Text(severity)
@@ -177,31 +224,34 @@ fun ReportScreen(viewModel: ReportViewModel, navController: NavController) {
             }
         }
 
-        // Description field
+        // Description
         OutlinedTextField(
             value = description,
-            onValueChange = { description = it; descError = null },
+            onValueChange = {
+                viewModel.updateDescription(it)
+                descError = null
+            },
             label = { Text("Description") },
             isError = descError != null,
-            supportingText = { if (descError != null) Text(descError!!) },
+            supportingText = { descError?.let { Text(it) } },
             modifier = Modifier
                 .fillMaxWidth()
-                .height(150.dp),
-            maxLines = 6
+                .height(150.dp)
         )
-        // Photo preview (shown after capture)
+
+        // Photo preview
         if (capturedImageUri != null) {
             AsyncImage(
                 model = capturedImageUri,
                 contentDescription = "Attached photo",
-                contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(200.dp)
                     .clip(RoundedCornerShape(12.dp))
             )
         }
-        // Add Picture button
+
+        // Camera button
         OutlinedButton(
             onClick = {
                 if (CameraPermissionHelper.hasCameraPermission(context)) {
@@ -212,22 +262,24 @@ fun ReportScreen(viewModel: ReportViewModel, navController: NavController) {
             },
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text(if (capturedImageUri == null) "📷 Add Picture" else "📷 Retake Picture")
+            Text(if (capturedImageUri == null) "Add Picture" else "Retake Picture")
         }
 
         Spacer(modifier = Modifier.weight(1f))
 
-        // Action buttons
+        // Actions
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+
             OutlinedButton(
                 onClick = { navController.popBackStack() },
                 modifier = Modifier.weight(1f)
             ) {
-                Text(stringResource(R.string.back))
+                Text("Back")
             }
+
             Button(
                 onClick = { validateAndSubmit() },
                 modifier = Modifier.weight(1f)

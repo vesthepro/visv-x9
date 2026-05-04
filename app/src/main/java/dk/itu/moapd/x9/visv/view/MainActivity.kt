@@ -102,7 +102,6 @@ class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceCh
 
                         CameraScreen(
                             viewModel = cameraViewModel,
-                            onOpenViewer = { },
                             onPhotoTaken = { uri ->
                                 navController.previousBackStackEntry
                                     ?.savedStateHandle
