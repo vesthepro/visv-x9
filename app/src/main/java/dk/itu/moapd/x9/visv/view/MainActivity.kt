@@ -13,6 +13,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -22,6 +23,7 @@ import dk.itu.moapd.x9.visv.viewmodels.ReportViewModel
 import dk.itu.moapd.x9.visv.R
 import dk.itu.moapd.x9.visv.core.preferences.LocationTrackingPreferences
 import dk.itu.moapd.x9.visv.service.LocationService
+import dk.itu.moapd.x9.visv.viewmodels.CameraViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
@@ -94,6 +96,22 @@ class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceCh
                     }
                     composable("map") {
                         MapScreen(viewModel = viewModel)
+                    }
+                    composable("camera") {
+                        val cameraViewModel: CameraViewModel = viewModel()
+
+                        CameraScreen(
+                            viewModel = cameraViewModel,
+                            onOpenViewer = { },
+                            onPhotoTaken = { uri ->
+                                navController.previousBackStackEntry
+                                    ?.savedStateHandle
+                                    ?.set("photo_uri", uri.toString())
+                            },
+                            onClose = {
+                                navController.popBackStack()
+                            }
+                        )
                     }
                 }
             }

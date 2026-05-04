@@ -15,6 +15,14 @@ import androidx.navigation.NavController
 import dk.itu.moapd.x9.visv.R
 import dk.itu.moapd.x9.visv.viewmodels.ReportViewModel
 import dk.itu.moapd.x9.visv.model.ReportModel
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import coil.compose.AsyncImage
+import dk.itu.moapd.x9.visv.permissions.CameraPermissionHelper
 
 
 private const val TAG = "ReportScreen"
@@ -30,6 +38,7 @@ fun ReportScreen(viewModel: ReportViewModel, navController: NavController) {
     var selectedSeverity by remember { mutableStateOf<String?>(null) }
     var selectedType by remember { mutableStateOf("None") }
     var dropdownExpanded by remember { mutableStateOf(false) }
+    var capturedImageUri by remember { mutableStateOf<Uri?>(null) }
 
     var titleError by remember { mutableStateOf<String?>(null) }
     var descError by remember { mutableStateOf<String?>(null) }
@@ -37,6 +46,20 @@ fun ReportScreen(viewModel: ReportViewModel, navController: NavController) {
 
     val reportTypes = listOf("None", "Heavy traffic", "Crash", "Speed camera", "Road incident", "Other")
     val severities = listOf("Minor", "Moderate", "Major")
+
+    // Permission launcher — requests camera permission, then navigates if granted
+    val permissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) navController.navigate("camera")
+        else Toast.makeText(context, "Camera permission is required to attach a photo", Toast.LENGTH_SHORT).show()
+    }
+    // Observe the URI returned by CameraScreen via savedStateHandle
+    val navBackStack = navController.currentBackStackEntry
+    val savedUriString = navBackStack?.savedStateHandle?.get<String>("photo_uri")
+    LaunchedEffect(savedUriString) {
+        savedUriString?.let { capturedImageUri = Uri.parse(it) }
+    }
 
     fun validateAndSubmit() {
         titleError = if (title.trim().isEmpty()) "Title cannot be empty" else null
@@ -58,6 +81,7 @@ fun ReportScreen(viewModel: ReportViewModel, navController: NavController) {
                 altitude = currentLocation?.altitude ?: "",
                 speed = currentLocation?.speed ?: "",
                 locationTime = currentLocation?.time ?: "",
+                photoUri = capturedImageUri?.toString() ?: "",
             )
             viewModel.addReport(report)
 
@@ -66,6 +90,7 @@ fun ReportScreen(viewModel: ReportViewModel, navController: NavController) {
             Log.d(TAG, "Type: $selectedType")
             Log.d(TAG, "Description: $description")
             Log.d(TAG, "Severity: $selectedSeverity")
+            Log.d(TAG, "Photo URI: $capturedImageUri")
 
             Toast.makeText(context, "Report received: $title", Toast.LENGTH_LONG).show()
             navController.popBackStack()
@@ -164,6 +189,31 @@ fun ReportScreen(viewModel: ReportViewModel, navController: NavController) {
                 .height(150.dp),
             maxLines = 6
         )
+        // Photo preview (shown after capture)
+        if (capturedImageUri != null) {
+            AsyncImage(
+                model = capturedImageUri,
+                contentDescription = "Attached photo",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+                    .clip(RoundedCornerShape(12.dp))
+            )
+        }
+        // Add Picture button
+        OutlinedButton(
+            onClick = {
+                if (CameraPermissionHelper.hasCameraPermission(context)) {
+                    navController.navigate("camera")
+                } else {
+                    permissionLauncher.launch(CameraPermissionHelper.CAMERA_PERMISSION)
+                }
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(if (capturedImageUri == null) "📷 Add Picture" else "📷 Retake Picture")
+        }
 
         Spacer(modifier = Modifier.weight(1f))
 

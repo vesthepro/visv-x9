@@ -13,4 +13,5 @@ data class ReportModel(
     val altitude: String = "",
     val speed: String = "",
     val locationTime: String = "",
+    val photoUri: String = "",
 )
