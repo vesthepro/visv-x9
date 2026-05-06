@@ -214,7 +214,7 @@ class LocationService : Service() {
                 locationCallback,
                 Looper.getMainLooper(),
             )
-        } catch (unlikely: SecurityException) {
+        } catch (_: SecurityException) {
             LocationTrackingPreferences.setTrackingEnabled(this, false)
         }
     }

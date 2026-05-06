@@ -3,7 +3,6 @@ package dk.itu.moapd.x9.visv.view
 import android.Manifest
 import android.content.pm.PackageManager
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -41,8 +40,7 @@ fun MapScreen(viewModel: ReportViewModel) {
     // Check location permission
     val hasPermission = ContextCompat.checkSelfPermission(
         context,
-        Manifest.permission.ACCESS_FINE_LOCATION
-    ) == PackageManager.PERMISSION_GRANTED
+        Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
 
     // Default to ITU if no location yet
     val itu = LatLng(55.6596, 12.5910)
@@ -138,7 +136,7 @@ fun MapScreen(viewModel: ReportViewModel) {
                         onClick = { selectedReport = null },
                         modifier = Modifier.align(Alignment.End)
                     ) {
-                        Text("Close")
+                        Text(stringResource(R.string.close))
                     }
                 }
             }

@@ -1,7 +1,6 @@
 package dk.itu.moapd.x9.visv.view
 
-import android.net.Uri
-import android.util.Log
+
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -10,24 +9,21 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import dk.itu.moapd.x9.visv.R
-import com.google.firebase.auth.FirebaseAuth
 import dk.itu.moapd.x9.visv.viewmodels.ReportViewModel
 import dk.itu.moapd.x9.visv.model.ReportModel
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringArrayResource
+import androidx.compose.ui.res.stringResource
 import coil.compose.AsyncImage
 import dk.itu.moapd.x9.visv.data.FirebaseStorageRepository
 import dk.itu.moapd.x9.visv.permissions.CameraPermissionHelper
 import androidx.core.net.toUri
-
-
-private const val TAG = "ReportScreen"
+import dk.itu.moapd.x9.visv.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -47,14 +43,16 @@ fun ReportScreen(viewModel: ReportViewModel, navController: NavController) {
     var isSubmitting by remember { mutableStateOf(false) }
     var dropdownExpanded by remember { mutableStateOf(false) }
 
-    val reportTypes = listOf("None", "Heavy traffic", "Crash", "Speed camera", "Road incident", "Other")
-    val severities = listOf("Minor", "Moderate", "Major")
+    val reportTypes = stringArrayResource(id = R.array.report_types)
+    val severities = stringArrayResource(id = R.array.severities)
+    val permissionDeniedText = stringResource(id = R.string.camera_permission_required)
 
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { granted ->
         if (granted) navController.navigate("camera")
-        else Toast.makeText(context, "Camera permission is required to attach a photo", Toast.LENGTH_SHORT).show()
+        else Toast.makeText(context,
+            permissionDeniedText, Toast.LENGTH_SHORT).show()
     }
 
     // Receive photo from CameraScreen
@@ -78,7 +76,6 @@ fun ReportScreen(viewModel: ReportViewModel, navController: NavController) {
         if (titleError != null || descError != null || severityError) return
 
         isSubmitting = true
-        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: "anonymous"
         val imageUri = capturedImageUri?.toUri()
 
         fun onSuccess() {
@@ -302,7 +299,7 @@ fun ReportScreen(viewModel: ReportViewModel, navController: NavController) {
                         color = MaterialTheme.colorScheme.onPrimary
                     )
                 } else {
-                    Text("Submit")
+                    Text(stringResource(R.string.submit))
                 }
             }
         }

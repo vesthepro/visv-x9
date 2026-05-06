@@ -29,17 +29,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
 import dk.itu.moapd.x9.visv.R
 
 @Composable
 fun SettingsScreen(
-    navController: NavController,
     auth: FirebaseAuth,
     onStartTracking: () -> Unit,
     onStopTracking: () -> Unit,
-    onLocationReady: ((Location) -> Unit) -> Unit,
 ) {
     val context = LocalContext.current
     var isTracking by remember { mutableStateOf(false) }
@@ -85,7 +82,7 @@ fun SettingsScreen(
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text(if (isTracking) "Stop Tracking" else "Start Tracking")
+                Text(if (isTracking) stringResource(R.string.stop_tracking) else stringResource(R.string.start_tracking))
             }
 
             Spacer(modifier = Modifier.height(8.dp))

@@ -13,17 +13,14 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import dk.itu.moapd.x9.visv.R
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.navigation.NavController
 import dk.itu.moapd.x9.visv.camerax.CameraXController
 import dk.itu.moapd.x9.visv.media.PhotoCaptureManager
 import dk.itu.moapd.x9.visv.permissions.CameraPermissionHelper
@@ -33,8 +30,8 @@ import kotlinx.coroutines.launch
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Circle
 import androidx.compose.material.icons.filled.Photo
-import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.SwitchCamera
+import androidx.compose.ui.res.stringResource
 
 @Composable
 fun CameraScreen(
@@ -53,9 +50,6 @@ fun CameraScreen(
     }
     var imageCapture by remember { mutableStateOf<ImageCapture?>(null) }
     var canSwitchCamera by remember { mutableStateOf(false) }
-
-    // Keep the latest image Uri so the viewer button can be enabled.
-    val imageUri: Uri? by viewModel.imageUri.observeAsState(initial = null)
 
     // Permission request.
     var hasPermission by remember {
@@ -133,7 +127,7 @@ fun CameraScreen(
             OutlinedIconCircleButton(
                 enabled = hasPermission && canSwitchCamera,
                 imageVector = Icons.Filled.SwitchCamera,
-                contentDescription = "Switch camera",
+                contentDescription = stringResource(R.string.switch_camera),
                 iconSize = 24.dp,
                 strokeWidth = 2.dp,
                 onClick = {
@@ -151,7 +145,7 @@ fun CameraScreen(
             OutlinedIconCircleButton(
                 enabled = hasPermission,
                 imageVector = Icons.Filled.Circle,
-                contentDescription = "Last taken image",
+                contentDescription = stringResource(R.string.last_taken_image),
                 iconSize = 80.dp,
                 strokeWidth = 2.dp,
                 onClick = {
@@ -188,7 +182,7 @@ fun CameraScreen(
             OutlinedIconCircleButton(
                 enabled = hasPermission,
                 imageVector = Icons.Filled.Photo,
-                contentDescription = "Gallery",
+                contentDescription = stringResource(R.string.gallery),
                 iconSize = 24.dp,
                 strokeWidth = 2.dp,
                 onClick = {
@@ -229,7 +223,7 @@ private fun takePhoto(
             if (uri != null) {
                 onSaved(uri, filename)
             } else {
-                onError("Failed to save photo")
+                onError(context.getString(R.string.failed_to_save_photo))
             }
         },
         onError = { message, _ -> onError(message) },

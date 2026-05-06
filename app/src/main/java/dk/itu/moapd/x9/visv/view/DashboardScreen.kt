@@ -10,20 +10,26 @@ import android.location.Location
 import android.util.Log
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
-import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.google.firebase.auth.FirebaseAuth
+import dk.itu.moapd.x9.visv.R
+import dk.itu.moapd.x9.visv.sensors.ShakeDetector
 import dk.itu.moapd.x9.visv.viewmodels.ReportViewModel
 
 
@@ -31,13 +37,20 @@ import dk.itu.moapd.x9.visv.viewmodels.ReportViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 fun DashboardScreen(
     viewModel: ReportViewModel,
-    navController: NavController,
     auth: FirebaseAuth,
     onLocationReady: ((Location) -> Unit) -> Unit,
 ) {
     val reports by viewModel.reports.collectAsState()
     val context = LocalContext.current
     val currentUid = auth.currentUser?.uid ?: ""
+
+    var showQuickReport by remember {mutableStateOf(false)}
+
+    DisposableEffect(Unit) {
+        val detector = ShakeDetector(context, onShake = {showQuickReport = true})
+        detector.register()
+        onDispose { detector.unregistor() }
+    }
 
     LaunchedEffect(Unit) {
         onLocationReady { location ->
@@ -56,7 +69,7 @@ fun DashboardScreen(
         Column(modifier = Modifier.fillMaxSize()) {
 
             Text(
-                text = "X9",
+                text = stringResource(R.string.x9),
                 style = MaterialTheme.typography.headlineLarge,
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center,
@@ -95,7 +108,7 @@ fun DashboardScreen(
                                     contentAlignment = Alignment.CenterEnd
                                 ) {
                                     Text(
-                                        text = "Delete",
+                                        text = stringResource(R.string.delete),
                                         color = MaterialTheme.colorScheme.onErrorContainer,
                                         modifier = Modifier.padding(end = 16.dp)
                                     )
@@ -123,6 +136,12 @@ fun DashboardScreen(
                     .padding(16.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {}
+        }
+        if (showQuickReport) {
+            QuickReportSheet(
+                viewModel = viewModel,
+                onDismiss = { showQuickReport = false }
+            )
         }
     }
 }
@@ -212,7 +231,7 @@ fun ReportItemCard(
 
                 AsyncImage(
                     model = imageUrl,
-                    contentDescription = "Report image",
+                    contentDescription = stringResource(R.string.report_image),
                     modifier = Modifier
                         .fillMaxWidth()
                         .wrapContentHeight(),

@@ -1,6 +1,5 @@
 package dk.itu.moapd.x9.visv.view
 
-import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.location.Location
@@ -37,7 +36,7 @@ class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceCh
     private val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
     private val viewModel: ReportViewModel by viewModels()
     private val sharedPreferences: SharedPreferences by lazy {
-        getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
+        getSharedPreferences(getString(R.string.preference_file_key), MODE_PRIVATE)
     }
     private var locationService: LocationService? = null
     private var locationServiceBound: Boolean = false
@@ -91,7 +90,6 @@ class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceCh
                         composable("dashboard") {
                             DashboardScreen(
                                 viewModel = viewModel,
-                                navController = navController,
                                 auth = auth,
                                 onLocationReady = { callback ->
                                     onLocationCallback = callback
@@ -107,7 +105,6 @@ class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceCh
                         }
                         composable("settings") {
                             SettingsScreen(
-                                navController = navController,
                                 auth = auth,
                                 onStartTracking = {
                                     if (locationServiceBound) {
@@ -119,12 +116,8 @@ class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceCh
                                 },
                                 onStopTracking = {
                                     locationService?.unsubscribeToLocationUpdates()
-                                },
-                                onLocationReady = { callback ->
-                                    onLocationCallback = callback
-                                    startCollectingIfReady()
                                 }
-                                )
+                            )
                         }
                         composable("camera") {
                             val cameraViewModel: CameraViewModel = viewModel()
@@ -144,51 +137,6 @@ class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceCh
 
                     }
                 }
-                /*NavHost(navController = navController, startDestination = "dashboard") {
-                    composable("dashboard") {
-                        DashboardScreen(
-                            viewModel = viewModel,
-                            navController = navController,
-                            auth = auth,
-                            onStartTracking = {
-                                if (locationServiceBound) {
-                                    locationService?.subscribeToLocationUpdates()
-                                } else {
-                                    pendingStartTracking = true
-                                    startLocationService()
-                                }
-                            },
-                            onStopTracking = {
-                                locationService?.unsubscribeToLocationUpdates()
-                            },
-                            onLocationReady = { callback ->
-                                onLocationCallback = callback
-                                startCollectingIfReady()
-                            }
-                        )
-                    }
-                    composable("report") {
-                        ReportScreen(viewModel = viewModel, navController = navController)
-                    }
-                    composable("map") {
-                        MapScreen(viewModel = viewModel)
-                    }
-                    composable("camera") {
-                        val cameraViewModel: CameraViewModel = viewModel()
-
-                        CameraScreen(
-                            viewModel = cameraViewModel,
-                            onPhotoTaken = { uri ->
-                                navController.previousBackStackEntry
-                                    ?.savedStateHandle
-                                    ?.set("photo_uri", uri.toString())
-                            },
-                            onClose = {
-                                navController.popBackStack()
-                            }
-                        )
-                    }
-                }*/
             }
         }
     }
@@ -207,7 +155,7 @@ class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceCh
         // bind service
 
         Intent(this, LocationService::class.java).also { intent ->
-            bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
+            bindService(intent, serviceConnection, BIND_AUTO_CREATE)
         }
     }
 

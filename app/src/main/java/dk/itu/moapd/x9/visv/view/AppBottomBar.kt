@@ -10,14 +10,16 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
+import dk.itu.moapd.x9.visv.R
 
 @Composable
 fun AppBottomBar(navController: NavController, currentRoute: String?) {
     NavigationBar {
         NavigationBarItem(
-            icon = { Icon(Icons.Default.Home, contentDescription = "Dashboard") },
-            label = { Text("Dashboard")},
+            icon = { Icon(Icons.Default.Home, contentDescription = (stringResource(R.string.dashboard))) },
+            label = { Text(stringResource(R.string.dashboard))},
             selected = currentRoute == "dashboard",
             onClick = {
                 navController.navigate("dashboard") {
@@ -28,8 +30,8 @@ fun AppBottomBar(navController: NavController, currentRoute: String?) {
             }
         )
         NavigationBarItem(
-            icon = { Icon(Icons.AutoMirrored.Filled.NoteAdd, contentDescription = "Report") },
-            label = { Text("Report")},
+            icon = { Icon(Icons.AutoMirrored.Filled.NoteAdd, contentDescription = stringResource(R.string.report)) },
+            label = { Text(stringResource(R.string.report))},
             selected = currentRoute == "report",
             onClick = {
                 navController.navigate("report") {
@@ -40,8 +42,8 @@ fun AppBottomBar(navController: NavController, currentRoute: String?) {
             }
         )
         NavigationBarItem(
-            icon = { Icon(Icons.Default.Map, contentDescription = "Map") },
-            label = { Text("Map") },
+            icon = { Icon(Icons.Default.Map, contentDescription = stringResource(R.string.map)) },
+            label = { Text(stringResource(R.string.map)) },
             selected = currentRoute == "map",
             onClick = {
                 navController.navigate("map") {
@@ -52,8 +54,8 @@ fun AppBottomBar(navController: NavController, currentRoute: String?) {
             }
         )
         NavigationBarItem(
-            icon = { Icon(Icons.Default.Settings, contentDescription = "Report") },
-            label = { Text("Settings")},
+            icon = { Icon(Icons.Default.Settings, contentDescription = stringResource(R.string.settings)) },
+            label = { Text(stringResource(R.string.settings))},
             selected = currentRoute == "settings",
             onClick = {
                 navController.navigate("settings") {
