@@ -104,4 +104,11 @@ class ReportViewModel : ViewModel() {
     fun updatePhoto(uri: String?) {
         _photoUri.value = uri
     }
+    fun clearForm() {
+        _title.value = ""
+        _description.value = ""
+        _selectedSeverity.value = null
+        _selectedType.value = "None"
+        _photoUri.value = null
+    }
 }

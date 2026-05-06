@@ -24,6 +24,7 @@ import androidx.compose.ui.draw.clip
 import coil.compose.AsyncImage
 import dk.itu.moapd.x9.visv.data.FirebaseStorageRepository
 import dk.itu.moapd.x9.visv.permissions.CameraPermissionHelper
+import androidx.core.net.toUri
 
 
 private const val TAG = "ReportScreen"
@@ -43,7 +44,7 @@ fun ReportScreen(viewModel: ReportViewModel, navController: NavController) {
     var titleError by remember { mutableStateOf<String?>(null) }
     var descError by remember { mutableStateOf<String?>(null) }
     var severityError by remember { mutableStateOf(false) }
-
+    var isSubmitting by remember { mutableStateOf(false) }
     var dropdownExpanded by remember { mutableStateOf(false) }
 
     val reportTypes = listOf("None", "Heavy traffic", "Crash", "Speed camera", "Road incident", "Other")
@@ -64,7 +65,7 @@ fun ReportScreen(viewModel: ReportViewModel, navController: NavController) {
 
     LaunchedEffect(savedUriString) {
         savedUriString?.let {
-            viewModel.updatePhoto(it)   // IMPORTANT: update ViewModel, NOT local state
+            viewModel.updatePhoto(it)
             navBackStackEntry.savedStateHandle.remove<String>("photo_uri")
         }
     }
@@ -76,8 +77,21 @@ fun ReportScreen(viewModel: ReportViewModel, navController: NavController) {
 
         if (titleError != null || descError != null || severityError) return
 
+        isSubmitting = true
         val uid = FirebaseAuth.getInstance().currentUser?.uid ?: "anonymous"
-        val imageUri = capturedImageUri?.let { Uri.parse(it) }
+        val imageUri = capturedImageUri?.toUri()
+
+        fun onSuccess() {
+            viewModel.clearForm()
+            Toast.makeText(context, "Report received: $title", Toast.LENGTH_LONG).show()
+            isSubmitting = false
+            navController.popBackStack()
+        }
+
+        fun onFailure() {
+            Toast.makeText(context, "Image upload failed", Toast.LENGTH_SHORT).show()
+            isSubmitting = false
+        }
 
         if (imageUri != null) {
 
@@ -100,12 +114,10 @@ fun ReportScreen(viewModel: ReportViewModel, navController: NavController) {
                     )
 
                     viewModel.addReport(report)
-
-                    Toast.makeText(context, "Report received: $title", Toast.LENGTH_LONG).show()
-                    navController.popBackStack()
+                    onSuccess()
                 },
                 onFailure = {
-                    Toast.makeText(context, "Image upload failed", Toast.LENGTH_SHORT).show()
+                    onFailure()
                 }
             )
 
@@ -125,9 +137,7 @@ fun ReportScreen(viewModel: ReportViewModel, navController: NavController) {
             )
 
             viewModel.addReport(report)
-
-            Toast.makeText(context, "Report received: $title", Toast.LENGTH_LONG).show()
-            navController.popBackStack()
+            onSuccess()
         }
     }
 
@@ -282,9 +292,18 @@ fun ReportScreen(viewModel: ReportViewModel, navController: NavController) {
 
             Button(
                 onClick = { validateAndSubmit() },
+                enabled = !isSubmitting,
                 modifier = Modifier.weight(1f)
             ) {
-                Text("Submit")
+                if (isSubmitting) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(18.dp),
+                        strokeWidth = 2.dp,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                } else {
+                    Text("Submit")
+                }
             }
         }
     }

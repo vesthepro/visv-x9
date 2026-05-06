@@ -4,18 +4,22 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.location.Location
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.auth.FirebaseAuth
 import dk.itu.moapd.x9.visv.view.ui.theme.X9Theme
@@ -68,7 +72,79 @@ class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceCh
         setContent {
             X9Theme {
                 val navController = rememberNavController()
-                NavHost(navController = navController, startDestination = "dashboard") {
+                val navBackStackEntry by navController.currentBackStackEntryAsState()
+                val currentRoute = navBackStackEntry?.destination?.route
+                val bottomBarRoutes = setOf("dashboard", "map", "settings")
+
+                Scaffold(
+                    bottomBar = {
+                        if (currentRoute in bottomBarRoutes) {
+                            AppBottomBar(navController = navController, currentRoute = currentRoute)
+                        }
+                    }
+                ) { innerPadding ->
+                    NavHost(
+                        navController = navController,
+                        startDestination = "dashboard",
+                        modifier = Modifier.padding(innerPadding)
+                    ) {
+                        composable("dashboard") {
+                            DashboardScreen(
+                                viewModel = viewModel,
+                                navController = navController,
+                                auth = auth,
+                                onLocationReady = { callback ->
+                                    onLocationCallback = callback
+                                    startCollectingIfReady()
+                                }
+                            )
+                        }
+                        composable("report") {
+                            ReportScreen(viewModel = viewModel, navController = navController)
+                        }
+                        composable("map") {
+                            MapScreen(viewModel = viewModel)
+                        }
+                        composable("settings") {
+                            SettingsScreen(
+                                navController = navController,
+                                auth = auth,
+                                onStartTracking = {
+                                    if (locationServiceBound) {
+                                        locationService?.subscribeToLocationUpdates()
+                                    } else {
+                                        pendingStartTracking = true
+                                        startLocationService()
+                                    }
+                                },
+                                onStopTracking = {
+                                    locationService?.unsubscribeToLocationUpdates()
+                                },
+                                onLocationReady = { callback ->
+                                    onLocationCallback = callback
+                                    startCollectingIfReady()
+                                }
+                                )
+                        }
+                        composable("camera") {
+                            val cameraViewModel: CameraViewModel = viewModel()
+
+                            CameraScreen(
+                                viewModel = cameraViewModel,
+                                onPhotoTaken = { uri ->
+                                    navController.previousBackStackEntry
+                                        ?.savedStateHandle
+                                        ?.set("photo_uri", uri.toString())
+                                },
+                                onClose = {
+                                    navController.popBackStack()
+                                }
+                            )
+                        }
+
+                    }
+                }
+                /*NavHost(navController = navController, startDestination = "dashboard") {
                     composable("dashboard") {
                         DashboardScreen(
                             viewModel = viewModel,
@@ -112,7 +188,7 @@ class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceCh
                             }
                         )
                     }
-                }
+                }*/
             }
         }
     }

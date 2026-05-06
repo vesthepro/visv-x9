@@ -1,8 +1,5 @@
 package dk.itu.moapd.x9.visv.view
 
-import android.content.Intent
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -20,7 +17,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -28,7 +24,6 @@ import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.google.firebase.auth.FirebaseAuth
-import dk.itu.moapd.x9.visv.R
 import dk.itu.moapd.x9.visv.viewmodels.ReportViewModel
 
 
@@ -38,27 +33,16 @@ fun DashboardScreen(
     viewModel: ReportViewModel,
     navController: NavController,
     auth: FirebaseAuth,
-    onStartTracking: () -> Unit,
-    onStopTracking: () -> Unit,
     onLocationReady: ((Location) -> Unit) -> Unit,
 ) {
     val reports by viewModel.reports.collectAsState()
     val context = LocalContext.current
     val currentUid = auth.currentUser?.uid ?: ""
 
-
-    val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission(),
-    ) { granted ->
-        if (granted) {
-           onStartTracking()
-        }
-    }
     LaunchedEffect(Unit) {
         onLocationReady { location ->
             Log.d("Location", "Lat: ${location.latitude}, Lng: ${location.longitude}")
             viewModel.updateLocation(context, location)
-            // you can pass this to the viewModel if needed
         }
     }
 
@@ -124,7 +108,10 @@ fun DashboardScreen(
                             type = report.reportType,
                             severity = report.reportSeverity,
                             description = report.reportDescription,
-                            imageUrl = report.photoUri
+                            imageUrl = report.photoUri,
+                            latitude = report.latitude,
+                            longitude = report.longitude,
+                            locationTime = report.locationTime,
                         )
                     }
                 }
@@ -135,62 +122,7 @@ fun DashboardScreen(
                     .fillMaxWidth()
                     .padding(16.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                Button(
-                    onClick = { navController.navigate("report") },
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text("To Report")
-                }
-                // GPS button
-                Button(
-                    onClick = {
-                        requestOrStartTracking(
-                            context = context,
-                            onHasPermission = {
-                                onStartTracking()
-                                Log.d("Location", "Started tracking")
-                                              },
-                            onRequestPermission = {
-                                permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-                            }
-                        )
-                    },
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text("Start Tracking")
-                }
-                Button(
-                    onClick = {
-                        onStopTracking()
-                        Log.d("Location", "Stopped tracking")
-                              },
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text("Stop")
-                }
-                Button(
-                    onClick = { navController.navigate("map") },
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text("Map")
-                }
-            }
-        }
-        Button(
-            onClick = {
-                auth.signOut()
-
-                val intent = Intent(context, LoginActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-
-                context.startActivity(intent)
-            },
-            modifier = Modifier
-                .align(Alignment.TopStart)
-                .padding(16.dp)
-        ) {
-            Text(stringResource(R.string.logout))
+            ) {}
         }
     }
 }
@@ -201,7 +133,10 @@ fun ReportItemCard(
     type: String,
     severity: String,
     description: String,
-    imageUrl: String? = null
+    imageUrl: String? = null,
+    latitude: String = "",
+    longitude: String = "",
+    locationTime: String = "",
 ) {
     ElevatedCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
@@ -211,11 +146,39 @@ fun ReportItemCard(
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
 
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.onSurface
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Top
+            ) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.weight(1f)
+                )
+
+                if (latitude.isNotEmpty() && longitude.isNotEmpty()) {
+                    Column(horizontalAlignment = Alignment.End) {
+                        if (locationTime.isNotEmpty()) {
+                            Text(
+                                text = locationTime,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        Text(
+                            text = "%.4f, %.4f".format(
+                                latitude.toDoubleOrNull() ?: 0.0,
+                                longitude.toDoubleOrNull() ?: 0.0
+                            ),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+
+                    }
+                }
+            }
 
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -244,7 +207,6 @@ fun ReportItemCard(
                 overflow = TextOverflow.Ellipsis
             )
 
-            // IMAGE MOVED TO BOTTOM
             if (!imageUrl.isNullOrEmpty()) {
                 Spacer(modifier = Modifier.height(12.dp))
 
