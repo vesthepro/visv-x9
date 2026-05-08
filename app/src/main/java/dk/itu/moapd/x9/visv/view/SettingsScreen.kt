@@ -2,7 +2,6 @@ package dk.itu.moapd.x9.visv.view
 
 import android.Manifest
 import android.content.Intent
-import android.location.Location
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts

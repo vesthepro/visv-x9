@@ -31,9 +31,19 @@
     <string name="last_taken_image">Last taken image</string>
     <string name="gallery">Gallery</string>
     <string name="failed_to_save_photo">Failed to save photo</string>
-    <string name="x9">X9</string>
     <string name="delete">Delete</string>
     <string name="report_image">Report image</string>
+    <string name="new_report">New Report</string>
+    <string name="title">Title</string>
+    <string name="description">Description</string>
+    <string name="attached_photo">Attached photo</string>
+    <string name="image_upload_failed">Image upload failed</string>
+    <string name="report_received">Report received: %1$s</string>
+    <string name="title_cannot_be_empty">Title cannot be empty</string>
+    <string name="description_cannot_be_empty">Description cannot be empty</string>
+    <string name="filed_via_shake_gesture">Filed via shake gesture.</string>
+    <string name="quick_report_type">Quick Report: %1$s</string>
+    <string name="none">None</string>
 
 
     <string-array name="report_types">

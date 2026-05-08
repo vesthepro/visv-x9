@@ -69,7 +69,7 @@ fun DashboardScreen(
         Column(modifier = Modifier.fillMaxSize()) {
 
             Text(
-                text = stringResource(R.string.x9),
+                text = stringResource(R.string.app_name),
                 style = MaterialTheme.typography.headlineLarge,
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center,

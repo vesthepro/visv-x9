@@ -18,8 +18,9 @@ fun QuickReportSheet(
     onDismiss: () -> Unit,
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val none = stringResource(id = R.string.none)
 
-    var selectedType by remember {mutableStateOf("None")}
+    var selectedType by remember {mutableStateOf(none)}
     var selectedSeverity by remember {mutableStateOf<String?>(null)}
     var severityError by remember {mutableStateOf(false)}
     var dropdownExpanded by remember {mutableStateOf(false)}
@@ -27,6 +28,8 @@ fun QuickReportSheet(
     val reportTypes = stringArrayResource(id = R.array.report_types)
     val severities = stringArrayResource(id = R.array.severities)
     val currentLocation by viewModel.currentLocation.collectAsState()
+    val filedShakeGesture = stringResource(R.string.filed_via_shake_gesture)
+    val quickRepType = stringResource(R.string.quick_report_type, selectedType)
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -112,10 +115,10 @@ fun QuickReportSheet(
                     }
                     viewModel.addReport(
                         ReportModel(
-                            reportTitle = "Quick Report: $selectedType",
+                            reportTitle = quickRepType,
                             reportType = selectedType,
                             reportSeverity = selectedSeverity!!,
-                            reportDescription = "Filed via shake gesture.",
+                            reportDescription = filedShakeGesture,
                             latitude = currentLocation?.latitude ?: "",
                             longitude = currentLocation?.longitude ?: "",
                             altitude = currentLocation?.altitude ?: "",

@@ -46,6 +46,11 @@ fun ReportScreen(viewModel: ReportViewModel, navController: NavController) {
     val reportTypes = stringArrayResource(id = R.array.report_types)
     val severities = stringArrayResource(id = R.array.severities)
     val permissionDeniedText = stringResource(id = R.string.camera_permission_required)
+    val imageUploadFailed = stringResource(id = R.string.image_upload_failed)
+    val reportReceived = stringResource(id = R.string.report_received, title)
+    val titleCannotEmpty = stringResource(id = R.string.title_cannot_be_empty)
+    val descCannotEmpty = stringResource(id = R.string.description_cannot_be_empty)
+    val none = stringResource(id = R.string.none)
 
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -69,8 +74,8 @@ fun ReportScreen(viewModel: ReportViewModel, navController: NavController) {
     }
 
     fun validateAndSubmit() {
-        titleError = if (title.trim().isEmpty()) "Title cannot be empty" else null
-        descError = if (description.trim().isEmpty()) "Description cannot be empty" else null
+        titleError = if (title.trim().isEmpty()) titleCannotEmpty else null
+        descError = if (description.trim().isEmpty()) descCannotEmpty else null
         severityError = selectedSeverity == null
 
         if (titleError != null || descError != null || severityError) return
@@ -80,13 +85,15 @@ fun ReportScreen(viewModel: ReportViewModel, navController: NavController) {
 
         fun onSuccess() {
             viewModel.clearForm()
-            Toast.makeText(context, "Report received: $title", Toast.LENGTH_LONG).show()
+            Toast.makeText(context,
+                reportReceived, Toast.LENGTH_LONG).show()
             isSubmitting = false
             navController.popBackStack()
         }
 
         fun onFailure() {
-            Toast.makeText(context, "Image upload failed", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context,
+                imageUploadFailed, Toast.LENGTH_SHORT).show()
             isSubmitting = false
         }
 
@@ -100,7 +107,7 @@ fun ReportScreen(viewModel: ReportViewModel, navController: NavController) {
                     val report = ReportModel(
                         reportTitle = title.trim(),
                         reportType = selectedType,
-                        reportSeverity = selectedSeverity ?: "None",
+                        reportSeverity = selectedSeverity ?: none,
                         reportDescription = description.trim(),
                         latitude = currentLocation?.latitude ?: "",
                         longitude = currentLocation?.longitude ?: "",
@@ -123,7 +130,7 @@ fun ReportScreen(viewModel: ReportViewModel, navController: NavController) {
             val report = ReportModel(
                 reportTitle = title.trim(),
                 reportType = selectedType,
-                reportSeverity = selectedSeverity ?: "None",
+                reportSeverity = selectedSeverity ?: none,
                 reportDescription = description.trim(),
                 latitude = currentLocation?.latitude ?: "",
                 longitude = currentLocation?.longitude ?: "",
@@ -148,7 +155,7 @@ fun ReportScreen(viewModel: ReportViewModel, navController: NavController) {
     ) {
 
         Text(
-            text = "New Report",
+            text = stringResource(R.string.new_report),
             style = MaterialTheme.typography.headlineLarge,
             color = MaterialTheme.colorScheme.onBackground
         )
@@ -160,7 +167,7 @@ fun ReportScreen(viewModel: ReportViewModel, navController: NavController) {
                 viewModel.updateTitle(it)
                 titleError = null
             },
-            label = { Text("Title") },
+            label = { Text(stringResource(R.string.title)) },
             isError = titleError != null,
             supportingText = { titleError?.let { Text(it) } },
             modifier = Modifier.fillMaxWidth(),
@@ -176,7 +183,7 @@ fun ReportScreen(viewModel: ReportViewModel, navController: NavController) {
                 value = selectedType,
                 onValueChange = {},
                 readOnly = true,
-                label = { Text("Type") },
+                label = { Text(stringResource(R.string.type)) },
                 trailingIcon = {
                     ExposedDropdownMenuDefaults.TrailingIcon(expanded = dropdownExpanded)
                 },
@@ -204,7 +211,7 @@ fun ReportScreen(viewModel: ReportViewModel, navController: NavController) {
         // Severity
         Column {
             Text(
-                text = "Severity",
+                text = stringResource(R.string.severity),
                 color = if (severityError)
                     MaterialTheme.colorScheme.error
                 else MaterialTheme.colorScheme.onSurface
@@ -238,7 +245,7 @@ fun ReportScreen(viewModel: ReportViewModel, navController: NavController) {
                 viewModel.updateDescription(it)
                 descError = null
             },
-            label = { Text("Description") },
+            label = { Text(stringResource(R.string.description)) },
             isError = descError != null,
             supportingText = { descError?.let { Text(it) } },
             modifier = Modifier
@@ -250,7 +257,7 @@ fun ReportScreen(viewModel: ReportViewModel, navController: NavController) {
         if (capturedImageUri != null) {
             AsyncImage(
                 model = capturedImageUri,
-                contentDescription = "Attached photo",
+                contentDescription = stringResource(R.string.attached_photo),
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(200.dp)
@@ -284,7 +291,7 @@ fun ReportScreen(viewModel: ReportViewModel, navController: NavController) {
                 onClick = { navController.popBackStack() },
                 modifier = Modifier.weight(1f)
             ) {
-                Text("Back")
+                Text(stringResource(R.string.back))
             }
 
             Button(
