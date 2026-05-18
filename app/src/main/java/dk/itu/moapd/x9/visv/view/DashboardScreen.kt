@@ -6,12 +6,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import android.Manifest
 import android.content.pm.PackageManager
-import android.location.Location
-import android.util.Log
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,7 +35,6 @@ import dk.itu.moapd.x9.visv.viewmodels.ReportViewModel
 fun DashboardScreen(
     viewModel: ReportViewModel,
     auth: FirebaseAuth,
-    onLocationReady: ((Location) -> Unit) -> Unit,
 ) {
     val reports by viewModel.reports.collectAsState()
     val context = LocalContext.current
@@ -52,12 +48,6 @@ fun DashboardScreen(
         onDispose { detector.unregistor() }
     }
 
-    LaunchedEffect(Unit) {
-        onLocationReady { location ->
-            Log.d("Location", "Lat: ${location.latitude}, Lng: ${location.longitude}")
-            viewModel.updateLocation(context, location)
-        }
-    }
 
 
     Box(

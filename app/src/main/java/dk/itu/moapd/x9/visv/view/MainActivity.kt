@@ -52,7 +52,7 @@ class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceCh
                 service.subscribeToLocationUpdates()
                 pendingStartTracking = false
             }
-
+            viewModel.bindToLocationService(service)
             startCollectingIfReady()
         },
         onDisconnected = {
@@ -91,10 +91,6 @@ class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceCh
                             DashboardScreen(
                                 viewModel = viewModel,
                                 auth = auth,
-                                onLocationReady = { callback ->
-                                    onLocationCallback = callback
-                                    startCollectingIfReady()
-                                }
                             )
                         }
                         composable("report") {
@@ -105,6 +101,7 @@ class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceCh
                         }
                         composable("settings") {
                             SettingsScreen(
+                                viewModel = viewModel,
                                 auth = auth,
                                 onStartTracking = {
                                     if (locationServiceBound) {

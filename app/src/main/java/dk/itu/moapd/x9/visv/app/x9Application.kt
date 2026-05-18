@@ -3,7 +3,6 @@ package dk.itu.moapd.x9.visv.app
 import android.app.Application
 import com.google.firebase.Firebase
 import com.google.firebase.database.database
-import dk.itu.moapd.x9.visv.core.preferences.LocationTrackingPreferences
 
 class X9Application : Application() {
 
@@ -29,6 +28,5 @@ class X9Application : Application() {
         // Enable disk persistence and keep the root reference synchronized.
         Firebase.database.setPersistenceEnabled(true)
         Firebase.database.reference.keepSynced(true)
-        LocationTrackingPreferences.setTrackingEnabled(this, false)
     }
 }

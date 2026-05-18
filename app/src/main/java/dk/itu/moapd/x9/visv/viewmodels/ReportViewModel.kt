@@ -1,9 +1,9 @@
 package dk.itu.moapd.x9.visv.viewmodels
 
-import android.content.Context
-import android.location.Location
+import android.app.Application
 import android.util.Log
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -15,8 +15,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import dk.itu.moapd.x9.visv.mapper.fieldsFromLocation
 import dk.itu.moapd.x9.visv.model.CurrentLocation
+import dk.itu.moapd.x9.visv.service.LocationService
+import kotlinx.coroutines.launch
 
-class ReportViewModel : ViewModel() {
+class ReportViewModel(application: Application) : AndroidViewModel(application) {
     private val _title = MutableStateFlow("")
     val title = _title.asStateFlow()
 
@@ -38,7 +40,9 @@ class ReportViewModel : ViewModel() {
     private val _reports = MutableStateFlow<List<ReportModel>>(emptyList())
     val reports: StateFlow<List<ReportModel>> = _reports
     private val _currentLocation = MutableStateFlow<CurrentLocation?>(null)
-    val currentLocation = _currentLocation.asStateFlow()
+    val currentLocation: StateFlow<CurrentLocation?> = _currentLocation
+    private val _isTracking = MutableStateFlow(false)
+    val isTracking: StateFlow<Boolean> = _isTracking.asStateFlow()
 
     init {
         listenToReports()
@@ -80,9 +84,21 @@ class ReportViewModel : ViewModel() {
         if (report.key.isBlank()) return
         reportsRef.child(report.key).removeValue()
     }
-    fun updateLocation(context: Context, location: Location) {
-        _currentLocation.value = fieldsFromLocation(context, location)
+    fun bindToLocationService(service: LocationService) {
+        viewModelScope.launch {
+            service.locationUpdates.collect { location ->
+                _currentLocation.value = fieldsFromLocation(
+                    getApplication(),
+                    location
+                )
+            }
+        }
     }
+
+    fun setTracking(value: Boolean) {
+        _isTracking.value = value
+    }
+
     fun updateTitle(value: String) {
         _title.value = value
     }

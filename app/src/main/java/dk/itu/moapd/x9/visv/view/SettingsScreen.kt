@@ -19,10 +19,8 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -30,20 +28,23 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.google.firebase.auth.FirebaseAuth
 import dk.itu.moapd.x9.visv.R
+import dk.itu.moapd.x9.visv.viewmodels.ReportViewModel
 
 @Composable
 fun SettingsScreen(
+    viewModel: ReportViewModel,
     auth: FirebaseAuth,
     onStartTracking: () -> Unit,
     onStopTracking: () -> Unit,
 ) {
     val context = LocalContext.current
-    var isTracking by remember { mutableStateOf(false) }
+    val isTracking by viewModel.isTracking.collectAsState()
 
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
     ) { granted ->
         if (granted) {
+            viewModel.setTracking(true)
             onStartTracking()
         }
     }
@@ -63,14 +64,14 @@ fun SettingsScreen(
                 onClick = {
                     if (isTracking) {
                         onStopTracking()
-                        isTracking = false
+                        viewModel.setTracking(false)
                         Log.d("Location", "Stopped tracking")
                     } else {
                         requestOrStartTracking(
                             context = context,
                             onHasPermission = {
                                 onStartTracking()
-                                isTracking = true
+                                viewModel.setTracking(true)
                                 Log.d("Location", "Started tracking")
                             },
                             onRequestPermission = {
